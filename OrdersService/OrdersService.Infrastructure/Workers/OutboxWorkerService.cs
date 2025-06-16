@@ -2,7 +2,6 @@ using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OrdersService.Domain.Interfaces;
-using OrdersService.Infrastructure.Persistence;
 
 namespace OrdersService.Infrastructure.Workers;
 
@@ -12,20 +11,20 @@ public class OutboxWorkerService(
     IProducer<string, string> producer)
     : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        while (!ct.IsCancellationRequested)
         {
             using var scope = scopeFactory.CreateScope();
             var repo = scope.ServiceProvider.GetRequiredService<IOutboxMessageRepository>();
 
-            await repo.BeginTransactionAsync(stoppingToken);
+            await repo.BeginTransactionAsync(ct);
 
-            var pending = await repo.GetPendingAsync(batchSize: 1, stoppingToken);
+            var pending = await repo.GetPendingAsync(batchSize: 1, ct);
             if (pending.Count == 0)
             {
-                await repo.RollbackTransactionAsync(stoppingToken);
-                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                await repo.RollbackTransactionAsync(ct);
+                await Task.Delay(TimeSpan.FromSeconds(1), ct);
                 continue;
             }
 
@@ -36,12 +35,12 @@ public class OutboxWorkerService(
                 Key   = msg.Id.ToString(),
                 Value = msg.Content
             };
-            await producer.ProduceAsync(msg.Type, kafkaMsg, stoppingToken);
+            await producer.ProduceAsync(msg.Type, kafkaMsg, ct);
 
             repo.MarkAsSuccess(msg);
-            await repo.SaveChangesAsync(stoppingToken);
+            await repo.SaveChangesAsync(ct);
             
-            await repo.CommitTransactionAsync(stoppingToken);
+            await repo.CommitTransactionAsync(ct);
         }
     }
 }

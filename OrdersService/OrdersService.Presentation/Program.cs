@@ -1,41 +1,52 @@
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using OrdersService.Infrastructure.Persistence;
+using OrdersService.Infrastructure.Repositories;
+using OrdersService.Infrastructure;
+using OrdersService.Application.Commands;
+using OrdersService.Presentation.Hubs;
+using OrdersService.Presentation.GraphQL;
+using OrdersService.Presentation.Middlewares;
+using OrdersService.Application.DTOs;
+using OrdersService.Domain.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Добавляем контроллеры и MediatR
+builder.Services.AddControllers();
+builder.Services.AddMediatR(typeof(CreateOrderCommandHandler).Assembly);
+
+builder.Services.AddDbContext<OrdersDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OrdersDatabase")));
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOutboxMessageRepository, OutboxMessageRepository>();
+builder.Services.AddScoped<ICommiter, Commiter>();
+
+// GraphQL
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<DbLoggerCategory.Query>()
+    .AddMutationType<Mutation>()
+    .AddType<OrderType>()
+    .AddFiltering()
+    .AddSorting();
+
+// SignalR
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+// Middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
-app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+// Эндпоинты
+app.MapControllers();
+app.MapGraphQL("/graphql");
+app.MapHub<OrderHub>("/hubs/orders");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

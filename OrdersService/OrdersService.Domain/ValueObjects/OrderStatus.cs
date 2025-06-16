@@ -1,10 +1,11 @@
+using System.Text.Json.Serialization;
+
 namespace OrdersService.Domain.ValueObjects;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum OrderStatus : short
 {
-    Pending,
-    Paid,
-    Shipped,
-    Delivered,
-    Failed
+    New,
+    Finished,
+    Cancelled
 }

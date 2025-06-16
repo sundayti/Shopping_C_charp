@@ -32,6 +32,6 @@ public sealed class Order
 
     public static Order Create(Guid userId, decimal amount, string description)
     {
-        return new Order(Guid.NewGuid(), userId, amount, description, OrderStatus.Pending);
+        return new Order(Guid.NewGuid(), userId, amount, description, OrderStatus.New);
     }
 }
