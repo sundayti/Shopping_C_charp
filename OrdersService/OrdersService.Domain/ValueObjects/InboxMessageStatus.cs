@@ -4,5 +4,4 @@ public enum InboxMessageStatus
 {
     Received,
     Success,
-    Failed
 }

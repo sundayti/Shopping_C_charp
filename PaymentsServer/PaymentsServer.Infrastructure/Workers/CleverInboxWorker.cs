@@ -59,28 +59,31 @@ public class CleverInboxWorker(IServiceScopeFactory scopeFactory, ILogger<Clever
                 var command = JsonSerializer.Deserialize<DebitAccountCommand>(message.Content);
                 if (command is null) 
                 {
-                    // TODO: обработка ошибки десериализации 
+                    logger.LogError("Wrong content.");
                     continue;
                 }
 
                 var result = await mediator.Send(command, ct);
                 
+                unitOfWork.InboxMessages.MarkAsSuccess(message);
+                
+                var isSuccess = true;
+                
                 switch (result.Value)
                 {
                     case Success:
-                        unitOfWork.InboxMessages.MarkAsSuccess(message);
                         logger.LogInformation("Success {OrderId}", command.OrderId);
                         break;
                     case AccountNotFoundError:
-                        unitOfWork.InboxMessages.MarkAsFailed(message);
+                        isSuccess = false;
                         logger.LogError("Account {UserId} not found", command.UserId);
                         break;
                     case InsufficientFundsError:
-                        unitOfWork.InboxMessages.MarkAsFailed(message);
+                        isSuccess = false;
                         logger.LogError("Insufficient funds for order {OrderId} by {UserId}", command.OrderId, command.UserId);
                         break;
                     default:
-                        unitOfWork.InboxMessages.MarkAsFailed(message);
+                        isSuccess = false;
                         logger.LogError("Unknown error for order {OrderId} by {UserId}", command.OrderId, command.UserId);
                         break;
                 }
@@ -88,19 +91,11 @@ public class CleverInboxWorker(IServiceScopeFactory scopeFactory, ILogger<Clever
                 var outboxContent = new OutboxMessageDto
                 {
                     OrderId = command.OrderId,
-                    IsSuccess = message.Status == InboxMessageStatus.Success
-                };
-                
-                var outboxMessage = new OutboxMessage
-                {
-                    Type = "payment_completed",
-                    Content = JsonSerializer.Serialize(outboxContent)
+                    IsSuccess = isSuccess
                 };
                 
                 var outboxCommand = new AddOutboxMessageCommand(Type: "close-order-topic", Content: JsonSerializer.Serialize(outboxContent));
                 await mediator.Send(outboxCommand, ct);
-                
-                await unitOfWork.OutboxMessages.AddAsync(outboxMessage, ct);
                 
                 await unitOfWork.CommitTransactionAsync(ct);
             }

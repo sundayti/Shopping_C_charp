@@ -30,9 +30,4 @@ public class InboxRepository(PaymentAccountsDbContext context) : IInboxRepositor
     {
         message.Status = InboxMessageStatus.Success;
     }
-
-    public void MarkAsFailed(InboxMessage message)
-    {
-        message.Status = InboxMessageStatus.Failed;
-    }
 }

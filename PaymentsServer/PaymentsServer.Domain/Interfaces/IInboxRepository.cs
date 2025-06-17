@@ -8,5 +8,4 @@ public interface IInboxRepository
     Task AddAsync(InboxMessage message, CancellationToken ct = default);
     Task<List<InboxMessage>> GetReceivedAsync(int batchSize, CancellationToken ct = default);
     void MarkAsSuccess(InboxMessage message);
-    void MarkAsFailed(InboxMessage message);
 }

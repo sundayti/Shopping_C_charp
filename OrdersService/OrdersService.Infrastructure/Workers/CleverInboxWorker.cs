@@ -60,19 +60,17 @@ public class CleverInboxWorker(IServiceScopeFactory scopeFactory, ILogger<Clever
                 }
 
                 var result = await mediator.Send(command, ct);
-                
+                unitOfWork.InboxMessages.MarkAsSuccess(message);
+
                 switch (result.Value)
                 {
                     case Success:
-                        unitOfWork.InboxMessages.MarkAsSuccess(message);
                         logger.LogInformation("Success {OrderId}", command.OrderId);
                         break;
                     case OrderNotFoundError:
-                        unitOfWork.InboxMessages.MarkAsFailed(message);
                         logger.LogError("Order {OrderId} not found", command.OrderId);
                         break;
                     default:
-                        unitOfWork.InboxMessages.MarkAsFailed(message);
                         logger.LogError("Unknown error for order {OrderId}", command.OrderId);
                         break;
                 }

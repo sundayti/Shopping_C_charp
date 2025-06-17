@@ -28,7 +28,7 @@ public class DebitAccountCommandHandler(IUnitOfWork unitOfWork)
 
         try
         {
-            account.Balance -= new Balance(request.Amount);
+            account.Balance -= request.Amount;
             unitOfWork.PaymentAccounts.Update(account);
             
             return new OneOf.Types.Success();
