@@ -26,7 +26,10 @@ builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var applicationAssembly = typeof(ApplicationAssemblyReference).GetTypeInfo().Assembly;
-builder.Services.AddMediatR(applicationAssembly);
+
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssemblies(applicationAssembly)
+);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
