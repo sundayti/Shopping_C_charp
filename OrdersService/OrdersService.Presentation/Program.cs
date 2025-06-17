@@ -60,6 +60,8 @@ builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
 
 builder.Services.AddHostedService<OutboxWorker>();
 
+builder.Logging.AddConsole();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

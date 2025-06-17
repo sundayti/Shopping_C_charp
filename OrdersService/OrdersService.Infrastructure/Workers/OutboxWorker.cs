@@ -1,14 +1,15 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OrdersService.Domain.Interfaces;
 
 namespace OrdersService.Infrastructure.Workers;
 
 public class OutboxWorker(
     IServiceScopeFactory scopeFactory,
-    IProducer<string, string> producer)
-    : BackgroundService
+    IProducer<string, string> producer,
+    ILogger<OutboxWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
@@ -34,10 +35,11 @@ public class OutboxWorker(
                 Key   = msg.Id.ToString(),
                 Value = msg.Content
             };
+
             await producer.ProduceAsync(msg.Type, kafkaMsg, ct);
+            logger.LogInformation("Kafka message produced: {Type} - {Content}", msg.Type, msg.Content);
 
             unitOfWork.OutboxMessages.MarkAsSuccess(msg);
-            
             await unitOfWork.CommitTransactionAsync(ct);
         }
     }
