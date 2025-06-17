@@ -13,7 +13,8 @@ public class StupidInboxWorker : BackgroundService
 
     public StupidInboxWorker(
         IServiceScopeFactory scopeFactory,
-        IConsumer<string, string> consumer)
+        IConsumer<string, string> consumer
+        )
     {
         _scopeFactory = scopeFactory;
         _consumer = consumer;
@@ -26,7 +27,7 @@ public class StupidInboxWorker : BackgroundService
         {
             try
             {
-                var cr = _consumer.Consume(ct);
+                var cr = _consumer.Consume(TimeSpan.FromSeconds(1));
                 var msg = System.Text.Json.JsonSerializer.Deserialize<InboxKafkaMessage>(cr.Message.Value);
 
                 if (msg != null)
@@ -52,6 +53,7 @@ public class StupidInboxWorker : BackgroundService
             {
                 Console.WriteLine($"Processing error: {ex.Message}");
             }
+            await Task.Delay(100, ct);
         }
 
         _consumer.Close();
