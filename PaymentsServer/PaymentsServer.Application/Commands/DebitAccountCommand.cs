@@ -33,7 +33,7 @@ public class DebitAccountCommandHandler(IUnitOfWork unitOfWork)
             
             return new OneOf.Types.Success();
         }
-        catch (ArgumentOutOfRangeException)
+        catch (InvalidOperationException)
         {
             return new InsufficientFundsError(request.UserId);
         }
