@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OrdersService.Application.Commands;
 using OrdersService.Application.DTOs;
@@ -12,15 +11,8 @@ namespace OrdersService.Presentation.Controllers;
 /// </summary>
 [ApiController]
 [Route("api")]
-public class OrdersController : ControllerBase
+public class OrdersController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public OrdersController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     /// <summary>
     /// Создаёт новый заказ и запускает асинхронный процесс оплаты.
     /// </summary>
@@ -38,7 +30,7 @@ public class OrdersController : ControllerBase
         var command = new CreateOrderCommand(request.UserId, request.Amount, request.Description);
         try
         {
-            var result = await _mediator.Send(command);
+            var result = await mediator.Send(command);
             return Ok(new { result });
         }
         catch
@@ -64,7 +56,7 @@ public class OrdersController : ControllerBase
         var query = new GetOrdersListQuery(userId);
         try
         {
-            var result = await _mediator.Send(query);
+            var result = await mediator.Send(query);
             return Ok(result);
         }
         catch
@@ -92,7 +84,7 @@ public class OrdersController : ControllerBase
         var query = new GetOrderStatusQuery(orderId);
         try
         {
-            var result = await _mediator.Send(query);
+            var result = await mediator.Send(query);
             return Ok(new { fileId = result.Status });
         }
         catch (KeyNotFoundException e)
