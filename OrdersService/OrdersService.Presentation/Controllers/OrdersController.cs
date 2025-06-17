@@ -28,7 +28,7 @@ public class OrdersController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("status/{orderId:guid}")]
-    public async Task<IActionResult> GetOrderStatus(Guid userId, Guid orderId)
+    public async Task<IActionResult> GetOrderStatus(Guid orderId)
     {
         var query = new GetOrderStatusQuery(orderId);
         var result = await mediator.Send(query);

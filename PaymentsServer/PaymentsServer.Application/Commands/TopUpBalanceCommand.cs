@@ -4,11 +4,11 @@ using PaymentsServer.Domain.Interfaces;
 
 namespace PaymentsServer.Application.Commands;
 
-public record TopUpBalanceCommand(Guid UserId, decimal Amount) : IRequest;
+public record TopUpBalanceCommand(Guid UserId, decimal Amount) : IRequest<Decimal>;
 
-public class TopUpBalanceCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<TopUpBalanceCommand>
+public class TopUpBalanceCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<TopUpBalanceCommand, Decimal>
 {
-    public async Task Handle(TopUpBalanceCommand request, CancellationToken ct)
+    public async Task<Decimal> Handle(TopUpBalanceCommand request, CancellationToken ct)
     {
         if (request.Amount <= 0)
         {
@@ -23,5 +23,6 @@ public class TopUpBalanceCommandHandler(IUnitOfWork unitOfWork) : IRequestHandle
         }
         
         account.Balance += request.Amount;
+        return account.Balance.Value;
     }
 }
