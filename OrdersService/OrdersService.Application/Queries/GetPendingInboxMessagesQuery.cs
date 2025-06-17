@@ -1,8 +1,10 @@
 using MediatR;
-using PaymentsServer.Domain.Entities;
-using PaymentsServer.Domain.Interfaces;
+using OrdersService.Domain.Entities;
+using OrdersService.Domain.Interfaces;
 
-namespace PaymentsServer.Application.Queries;
+namespace OrdersService.Application.Queries;
+
+public record GetPendingInboxMessagesQuery(int BatchSize) : IRequest<List<InboxMessage>>;
 
 public class GetPendingInboxMessagesQueryHandler(IUnitOfWork unitOfWork) 
     : IRequestHandler<GetPendingInboxMessagesQuery, List<InboxMessage>>

@@ -23,8 +23,13 @@ public class OrderRepository(OrdersDbContext dbContext) : IOrderRepository
             .ToListAsync(ct);
     }
 
-    public void Add(Order order)
+    public async Task AddAsync(Order order, CancellationToken ct = default)
     {
-        dbContext.Orders.Add(order);
+        await dbContext.Orders.AddAsync(order, ct);
+    }
+    
+    public void Update(Order order)
+    {
+        dbContext.Orders.Update(order);
     }
 }

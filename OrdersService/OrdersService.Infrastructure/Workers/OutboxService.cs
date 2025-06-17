@@ -5,7 +5,6 @@ using OrdersService.Domain.Interfaces;
 
 namespace OrdersService.Infrastructure.Workers;
 
-
 public class OutboxWorkerService(
     IServiceScopeFactory scopeFactory,
     IProducer<string, string> producer)
@@ -16,14 +15,14 @@ public class OutboxWorkerService(
         while (!ct.IsCancellationRequested)
         {
             using var scope = scopeFactory.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<IOutboxMessageRepository>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-            await repo.BeginTransactionAsync(ct);
+            await unitOfWork.BeginTransactionAsync(ct);
 
-            var pending = await repo.GetPendingAsync(batchSize: 1, ct);
+            var pending = await unitOfWork.OutboxMessages.GetPendingAsync(batchSize: 1, ct);
             if (pending.Count == 0)
             {
-                await repo.RollbackTransactionAsync(ct);
+                await unitOfWork.RollbackTransactionAsync(ct);
                 await Task.Delay(TimeSpan.FromSeconds(1), ct);
                 continue;
             }
@@ -37,10 +36,9 @@ public class OutboxWorkerService(
             };
             await producer.ProduceAsync(msg.Type, kafkaMsg, ct);
 
-            repo.MarkAsSuccess(msg);
-            await repo.SaveChangesAsync(ct);
+            unitOfWork.OutboxMessages.MarkAsSuccess(msg);
             
-            await repo.CommitTransactionAsync(ct);
+            await unitOfWork.CommitTransactionAsync(ct);
         }
     }
 }

@@ -19,7 +19,7 @@ builder.Services.AddMediatR(typeof(CreateOrderCommandHandler).Assembly);
 builder.Services.AddDbContext<OrdersDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("OrdersDatabase")));
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOutboxMessageRepository, OutboxMessageRepository>();
+builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
 builder.Services.AddScoped<ICommiter, Commiter>();
 
 // GraphQL
