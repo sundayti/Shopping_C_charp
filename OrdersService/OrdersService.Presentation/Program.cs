@@ -2,6 +2,7 @@ using System.Reflection;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using OrdersService.Application;
 using OrdersService.Domain.Interfaces;
 using OrdersService.Infrastructure.Persistence;
@@ -37,7 +38,22 @@ builder.WebHost.ConfigureKestrel(options =>
         listenOptions.Protocols = HttpProtocols.Http1AndHttp2);
 });
 
-builder.Services.AddSingleton<IProducer<string, string>>(sp =>
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { 
+        Title = "FileAnalyticsService API", 
+        Version = "v1" 
+    });
+    
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+});
+
+builder.Services.AddSingleton<IProducer<string, string>>(_ =>
 {
     var config = new ProducerConfig
     {
@@ -46,7 +62,7 @@ builder.Services.AddSingleton<IProducer<string, string>>(sp =>
     return new ProducerBuilder<string, string>(config).Build();
 });
 
-builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
+builder.Services.AddSingleton<IConsumer<string, string>>(_ =>
 {
     var config = new ConsumerConfig
     {
@@ -71,7 +87,12 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
     db.Database.Migrate();
 }
-
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("v1/swagger.json", "OrdersService API v1");
+    c.RoutePrefix = "swagger";
+});
 app.MapControllers();
 
 app.Run();
