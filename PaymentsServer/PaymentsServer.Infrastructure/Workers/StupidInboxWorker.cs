@@ -20,13 +20,13 @@ public class StupidInboxWorker : BackgroundService
         _consumer.Subscribe("create-order-topic");
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        while (!ct.IsCancellationRequested)
         {
             try
             {
-                var cr = _consumer.Consume(stoppingToken);
+                var cr = _consumer.Consume(ct);
 
                 var msg = System.Text.Json.JsonSerializer.Deserialize<InboxKafkaMessage>(cr.Message.Value);
 
@@ -39,7 +39,7 @@ public class StupidInboxWorker : BackgroundService
                         Id = msg.Id,
                         Type = msg.Type,
                         Content = msg.Content
-                    });
+                    }, ct);
 
                 _consumer.Commit(cr);
             }

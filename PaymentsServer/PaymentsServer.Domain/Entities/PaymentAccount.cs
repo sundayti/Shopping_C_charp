@@ -5,7 +5,7 @@ namespace PaymentsServer.Domain.Entities;
 public class PaymentAccount
 {
     public Guid UserId { get; init; }
-    public Balance Balance { get; private set; } = 0;
+    public Balance Balance { get; set; } = 0;
     
     private PaymentAccount() {}
 

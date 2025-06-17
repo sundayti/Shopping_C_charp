@@ -5,7 +5,7 @@ namespace OrdersService.Domain.Entities;
 
 public sealed class Order
 {
-    [JsonPropertyName("id")]
+    [JsonPropertyName("order_id")]
     public Guid Id { get; init; }
     [JsonPropertyName("user_id")]
     public Guid UserId { get; init; }

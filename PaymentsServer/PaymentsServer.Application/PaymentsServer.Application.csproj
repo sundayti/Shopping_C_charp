@@ -7,8 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Commands\" />
-      <Folder Include="Queries\" />
+        <PackageReference Include="MediatR" Version="12.5.0" />
+        <PackageReference Include="OneOf" Version="3.0.263" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\PaymentsServer.Domain\PaymentsServer.Domain.csproj" />
     </ItemGroup>
 
 </Project>
