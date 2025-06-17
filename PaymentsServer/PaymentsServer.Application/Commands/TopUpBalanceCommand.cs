@@ -23,6 +23,7 @@ public class TopUpBalanceCommandHandler(IUnitOfWork unitOfWork) : IRequestHandle
         }
         
         account.Balance += request.Amount;
+        await unitOfWork.SaveChangesAsync(ct);
         return account.Balance.Value;
     }
 }
