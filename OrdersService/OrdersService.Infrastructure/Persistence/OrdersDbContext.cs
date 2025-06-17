@@ -7,16 +7,16 @@ namespace OrdersService.Infrastructure.Persistence;
 
 public class OrdersDbContext(DbContextOptions<OrdersDbContext> options) : DbContext(options)
 {
-    public DbSet<OutboxMessage> OutboxMessage {get; init;}
+    public DbSet<OutboxMessage> OutboxMessages {get; init;}
     public DbSet<Order> Orders {get; init;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        CreateCreateOrderOutboxMessageDb(modelBuilder);
+        CreateOutboxMessageDb(modelBuilder);
         CreateOrderDb(modelBuilder);
     }
 
-    private void CreateCreateOrderOutboxMessageDb(ModelBuilder modelBuilder)
+    private void CreateOutboxMessageDb(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<OutboxMessage>(entity =>
         {
@@ -24,7 +24,7 @@ public class OrdersDbContext(DbContextOptions<OrdersDbContext> options) : DbCont
                 status => (short)status,
                 status => (OutboxMessageStatus)status);
             
-            entity.ToTable("outbox_message");
+            entity.ToTable("outbox_messages");
             entity.HasKey(e => e.Id);
 
             entity.Property(x => x.Id)

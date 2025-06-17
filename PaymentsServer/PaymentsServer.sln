@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentsServer.Domain", "PaymentsServer.Domain\PaymentsServer.Domain.csproj", "{856A26D7-113E-40DF-98C4-37647293CDF1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentsServer.Application", "PaymentsServer.Application\PaymentsServer.Application.csproj", "{28678F84-49E3-47F2-9AF1-4745FFF7ABE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentsServer.Infrastructure", "PaymentsServer.Infrastructure\PaymentsServer.Infrastructure.csproj", "{CE8F6C99-2C8E-4F9C-9D24-BD8AA66E8C1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{856A26D7-113E-40DF-98C4-37647293CDF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{856A26D7-113E-40DF-98C4-37647293CDF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{856A26D7-113E-40DF-98C4-37647293CDF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28678F84-49E3-47F2-9AF1-4745FFF7ABE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28678F84-49E3-47F2-9AF1-4745FFF7ABE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28678F84-49E3-47F2-9AF1-4745FFF7ABE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28678F84-49E3-47F2-9AF1-4745FFF7ABE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE8F6C99-2C8E-4F9C-9D24-BD8AA66E8C1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE8F6C99-2C8E-4F9C-9D24-BD8AA66E8C1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE8F6C99-2C8E-4F9C-9D24-BD8AA66E8C1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE8F6C99-2C8E-4F9C-9D24-BD8AA66E8C1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

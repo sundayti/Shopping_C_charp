@@ -19,7 +19,7 @@ public class OutboxMessageRepository(OrdersDbContext dbContext) : IOutboxMessage
 
     public async Task<List<OutboxMessage>> GetPendingAsync(int batchSize, CancellationToken ct = default)
     {
-        return await _db.OutboxMessage
+        return await _db.OutboxMessages
             .Where(x => x.Status == OutboxMessageStatus.InProgress)
             .OrderBy(x => x.CreatedAt)
             .Take(batchSize)
@@ -35,7 +35,7 @@ public class OutboxMessageRepository(OrdersDbContext dbContext) : IOutboxMessage
     public void Add(OutboxMessage msg)
     {
         if (msg == null) throw new ArgumentNullException(nameof(msg));
-        _db.OutboxMessage.Add(msg);
+        _db.OutboxMessages.Add(msg);
     }
 
     public Task SaveChangesAsync(CancellationToken ct = default)

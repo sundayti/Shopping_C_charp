@@ -6,17 +6,17 @@ namespace OrdersService.Domain.Entities;
 public sealed class Order
 {
     [JsonPropertyName("id")]
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
     [JsonPropertyName("user_id")]
-    public Guid UserId { get; set; }
+    public Guid UserId { get; init; }
     [JsonPropertyName("amount")]
-    public decimal Amount { get; set; }
+    public decimal Amount { get; init; }
     [JsonIgnore]
-    public string Description { get; set; }
+    public string Description { get; init; }
     [JsonIgnore]
     public OrderStatus Status { get; set; }
     [JsonIgnore]
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
     
     private Order() { }
 
