@@ -102,8 +102,16 @@ app.UseWebSockets();
 
 app.Map("/api/ws/{orderId:guid}", async (HttpContext context, Guid orderId, IMediator mediator) =>
 {
+    Console.WriteLine($"Incoming request: {context.Request.Path}");
+    
     if (!context.WebSockets.IsWebSocketRequest)
     {
+        Console.WriteLine("Not a WebSocket request!");
+        Console.WriteLine("Headers:");
+        foreach (var header in context.Request.Headers)
+        {
+            Console.WriteLine($"{header.Key}: {header.Value}");
+        }
         context.Response.StatusCode = 400;
         return;
     }
