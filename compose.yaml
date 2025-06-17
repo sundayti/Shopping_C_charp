@@ -20,17 +20,14 @@
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
-      # listener’ы, как раньше
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_DOCKER://0.0.0.0:29092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_DOCKER://kafka:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_DOCKER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_DOCKER
 
-      # ↓↓↓ эти две строки решают проблему с __consumer_offsets ↓↓↓
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
-      # Опционально, чтобы все создаваемые топики имели RF=1 по умолчанию:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 1
     networks:
       - backend
@@ -43,6 +40,8 @@
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_PAYMENTS_DB}
+      - Kafka__BootstrapServers=kafka:29092
+      - Kafka__GroupId=payments-group
     volumes:
       - payments_postgres_data:/var/lib/postgresql/data
     expose:
@@ -61,6 +60,8 @@
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_ORDERS_DB}
+      - Kafka__BootstrapServers=kafka:29092
+      - Kafka__GroupId=orders-group
     command: ["postgres", "-c", "port=2345"]
     volumes:
       - orders_postgres_data:/var/lib/postgresql/data
