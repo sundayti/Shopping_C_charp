@@ -8,7 +8,7 @@ using PaymentsServer.Application.Queries;
 namespace PaymentsServer.Presentation.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api")]
 public class PaymentAccountsController(IMediator mediator) : ControllerBase
 {
     [HttpPost("{userId:guid}")]
@@ -54,7 +54,7 @@ public class PaymentAccountsController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("balance")]
-    public async Task<IActionResult> GetBalance([FromBody] Guid userId)
+    public async Task<IActionResult> GetBalance([FromQuery] Guid userId)
     {
         var query = new GetBalanceQuery(userId);
         try

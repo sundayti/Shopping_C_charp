@@ -38,23 +38,23 @@ builder.WebHost.ConfigureKestrel(options =>
         listenOptions.Protocols = HttpProtocols.Http1AndHttp2);
 });
 
-var kafkaSection = builder.Configuration.GetSection("Kafka");
-var consumerConfig = new ConsumerConfig
-{
-    BootstrapServers = kafkaSection.GetValue<string>("BootstrapServers") ?? throw new InvalidOperationException("Kafka:BootstrapServers is not configured."),
-    GroupId            = kafkaSection.GetValue<string>("GroupId") ?? "payments-group",
-    AutoOffsetReset    = AutoOffsetReset.Earliest,
-    EnableAutoCommit   = false
-};
-builder.Services.AddSingleton(consumerConfig);
+// var kafkaSection = builder.Configuration.GetSection("Kafka");
+// var consumerConfig = new ConsumerConfig
+// {
+//     BootstrapServers = kafkaSection.GetValue<string>("BootstrapServers") ?? throw new InvalidOperationException("Kafka:BootstrapServers is not configured."),
+//     GroupId            = kafkaSection.GetValue<string>("GroupId") ?? "payments-group",
+//     AutoOffsetReset    = AutoOffsetReset.Earliest,
+//     EnableAutoCommit   = false
+// };
+// builder.Services.AddSingleton(consumerConfig);
 
-builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
-    new ConsumerBuilder<string, string>(sp.GetRequiredService<ConsumerConfig>())
-        .SetKeyDeserializer(Deserializers.Utf8)
-        .SetValueDeserializer(Deserializers.Utf8)
-        .Build());
+// builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
+//     new ConsumerBuilder<string, string>(sp.GetRequiredService<ConsumerConfig>())
+//         .SetKeyDeserializer(Deserializers.Utf8)
+//         .SetValueDeserializer(Deserializers.Utf8)
+//         .Build());
 
-builder.Services.AddHostedService<StupidInboxWorker>();
+// builder.Services.AddHostedService<StupidInboxWorker>();
 
 var app = builder.Build();
 

@@ -13,6 +13,7 @@ public class CreatePaymentAccountCommandHandler(IUnitOfWork unitOfWork) : IReque
         var uid = request.UserId ?? Guid.NewGuid();
         var account = new PaymentAccount(uid);
         await unitOfWork.PaymentAccounts.AddAsync(account, ct);
+        await unitOfWork.SaveChangesAsync(ct);
         return uid;
     }
 }
