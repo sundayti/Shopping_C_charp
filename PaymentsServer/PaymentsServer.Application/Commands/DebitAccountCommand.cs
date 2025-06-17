@@ -12,13 +12,13 @@ public record DebitAccountCommand(
     [property: JsonPropertyName("user_id")] Guid UserId,
     [property: JsonPropertyName("order_id")] Guid OrderId,
     [property: JsonPropertyName("amount")] decimal Amount) 
-    : IRequest<OneOf.OneOf<OneOf.Types.Success, AccountNotFoundError, InsufficientFundsError>>;
+    : IRequest<OneOf.OneOf<Success, AccountNotFoundError, InsufficientFundsError>>;
     
 
 public class DebitAccountCommandHandler(IUnitOfWork unitOfWork) 
-    : IRequestHandler<DebitAccountCommand, OneOf.OneOf<OneOf.Types.Success, AccountNotFoundError, InsufficientFundsError>>
+    : IRequestHandler<DebitAccountCommand, OneOf.OneOf<Success, AccountNotFoundError, InsufficientFundsError>>
 {
-    public async Task<OneOf.OneOf<OneOf.Types.Success, AccountNotFoundError, InsufficientFundsError>> Handle(DebitAccountCommand request, CancellationToken ct)
+    public async Task<OneOf.OneOf<Success, AccountNotFoundError, InsufficientFundsError>> Handle(DebitAccountCommand request, CancellationToken ct)
     {
         var account = await unitOfWork.PaymentAccounts.GetByIdAsync(request.UserId, ct);
         if (account is null)
@@ -31,7 +31,7 @@ public class DebitAccountCommandHandler(IUnitOfWork unitOfWork)
             account.Balance -= request.Amount;
             unitOfWork.PaymentAccounts.Update(account);
             
-            return new OneOf.Types.Success();
+            return new Success();
         }
         catch (InvalidOperationException)
         {
