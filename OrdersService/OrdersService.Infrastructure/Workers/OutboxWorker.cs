@@ -35,7 +35,7 @@ public class OutboxWorker(
                 Key   = msg.Id.ToString(),
                 Value = msg.Content
             };
-
+            
             await producer.ProduceAsync(msg.Type, kafkaMsg, ct);
             logger.LogInformation("Kafka message produced: {Type} - {Content}", msg.Type, msg.Content);
 

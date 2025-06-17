@@ -35,16 +35,23 @@ public class StupidInboxWorker : BackgroundService
             {
                 _logger.LogInformation("Waiting for messages...");
                 var cr = _consumer.Consume(TimeSpan.FromSeconds(1));
-                var msg = System.Text.Json.JsonSerializer.Deserialize<InboxKafkaMessage>(cr.Message.Value);
-
+                _logger.LogInformation("Got message Value: {Value}", cr.Message.Value);
+                
+                var msg = cr.Message.Value;
+                var id = cr.Message.Key;
+                if (!Guid.TryParse(id, out var guid))
+                {
+                    _logger.LogWarning("Invalid GUID: {Id}", id);
+                    return;
+                }
                 if (msg != null)
                 {
                     _logger.LogInformation("Got message Key: {Key}", cr.Message.Key);
                     _logger.LogInformation("Got message Value: {Value}", cr.Message.Value);
                     using var scope = _scopeFactory.CreateScope();
                     var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-
-                    var command = new AddInboxMessageCommand(msg.Id, msg.Type, msg.Content);
+                    
+                    var command = new AddInboxMessageCommand(guid, "create-order-topic", msg);
                     await mediator.Send(command, ct);
                     
                     _consumer.Commit(cr);
@@ -70,5 +77,3 @@ public class StupidInboxWorker : BackgroundService
         _consumer.Close();
     }
 }
-
-public record InboxKafkaMessage(Guid Id, string Type, string Content);
