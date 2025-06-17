@@ -31,7 +31,7 @@ public class OrdersController(IMediator mediator) : ControllerBase
         try
         {
             var result = await mediator.Send(command);
-            return Ok(new { result });
+            return Ok(new { orderId = result });
         }
         catch
         {
@@ -85,7 +85,7 @@ public class OrdersController(IMediator mediator) : ControllerBase
         try
         {
             var result = await mediator.Send(query);
-            return Ok(new { fileId = result.Status });
+            return Ok(new { status = result.Status });
         }
         catch (KeyNotFoundException e)
         {

@@ -54,7 +54,7 @@
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/yourorg/shopping-csharp.git
+   git clone https://github.com/sundayti/Shopping_C_charp.git
    cd Shopping_C_charp
    ```
 
@@ -121,7 +121,7 @@
 
 ---
 
-Прямо сейчас приложение развёрнуто на sundayti.ru:
+Прямо сейчас приложение развёрнуто на http://sundayti.ru/kpo_3:
   - `POST /orders` — создание заказа (записывает в БД и в outbox)
   - `GET /orders/{userId}` — список заказов пользователя
   - `GET /orders/status/{orderId}` — статус заказа
@@ -138,20 +138,6 @@ Swagger UI автоматически доступен по адресам:
 - OrdersService: `http://sundayti.ru:6001/swagger`
 - PaymentsService: `http://sundayti.ru:6000/swagger`
 
-
----
-
-## Миграции и инициализация БД
-
-Если нужно запустить миграции вручную:
-
-```bash
-cd OrdersService.Presentation
-dotnet ef database update
-
-cd PaymentsServer.Presentation
-dotnet ef database update
-```
 
 ---
 
