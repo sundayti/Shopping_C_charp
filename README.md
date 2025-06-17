@@ -106,6 +106,9 @@
   - `GET /api/{userId}` — список заказов пользователя
   - `GET /api/status/{orderId}` — статус заказа
 
+- **WebSocket**
+  - `ws://sundayti.ru/kpo_3/orders/ws/{orderId}` - статус заказа через WebSocket
+
 ### PaymentsService
 
 - **InboxWorker (StupidInboxWorker)**
@@ -118,6 +121,7 @@
   - `POST /api/` — создать счёт и вернуть ID
   - `GET /api/balance?userId={userId}` — получить баланс
   - `POST /api/deposit?userId={userId}&amount={amount}` — пополнить баланс
+
 
 ---
 
@@ -138,6 +142,24 @@ Swagger UI автоматически доступен по адресам:
 - OrdersService: `http://sundayti.ru:6001/swagger`
 - PaymentsService: `http://sundayti.ru:6000/swagger`
 
+
+---
+
+## iOS приложение
+
+Ссылка на скачивание: 
+
+Реализованы 5 экранов:
+- Список заказов
+- Баланс
+- Менеджер аккаунтов 
+- Экран создания заказа
+- Экран просмотра статуса заказа
+
+На экране просмотра статуса заказа реализован WebSocket:
+- `Оранжевый` - новый заказ
+- `Зелеёный` - завершённый заказ
+- `Красный` - отменённый заказ
 
 ---
 
