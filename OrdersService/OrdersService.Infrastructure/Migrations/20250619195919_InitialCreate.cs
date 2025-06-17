@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace PaymentsServer.Infrastructure.Migrations
+namespace OrdersService.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -27,6 +27,22 @@ namespace PaymentsServer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    status = table.Column<short>(type: "smallint", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "outbox_messages",
                 columns: table => new
                 {
@@ -40,18 +56,6 @@ namespace PaymentsServer.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_outbox_messages", x => x.message_id);
                 });
-
-            migrationBuilder.CreateTable(
-                name: "payment_accounts",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    balance = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_payment_accounts", x => x.id);
-                });
         }
 
         /// <inheritdoc />
@@ -61,10 +65,10 @@ namespace PaymentsServer.Infrastructure.Migrations
                 name: "inbox_messages");
 
             migrationBuilder.DropTable(
-                name: "outbox_messages");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "payment_accounts");
+                name: "outbox_messages");
         }
     }
 }
