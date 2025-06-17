@@ -78,7 +78,7 @@ public class PaymentAccountsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("deposit")]
-    public async Task<IActionResult> UpdateBalance([FromBody] Guid userId, [FromBody] decimal amount)
+    public async Task<IActionResult> UpdateBalance([FromQuery] Guid userId, [FromQuery] decimal amount)
     {
         var command = new TopUpBalanceCommand(userId, amount);
         try

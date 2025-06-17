@@ -12,7 +12,7 @@ using PaymentsServer.Infrastructure.Persistence;
 namespace PaymentsServer.Infrastructure.Migrations
 {
     [DbContext(typeof(PaymentAccountsDbContext))]
-    [Migration("20250618201043_InitialCreate")]
+    [Migration("20250619073322_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

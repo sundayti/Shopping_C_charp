@@ -16,7 +16,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException("Connection string 'Postgres' is not configured.");
 
 builder.Services.AddDbContext<PaymentAccountsDbContext>(options =>
-    options.UseNpgsql(connectionString)
+    options.UseNpgsql(connectionString, x => x.MigrationsAssembly("PaymentsServer.Infrastructure"))
 );
 
 builder.Services.AddScoped<IPaymentAccountRepository, PaymentAccountRepository>();
