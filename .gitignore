@@ -18,4 +18,3 @@ obj/
 *.db
 
 .env
-appsettings.json
