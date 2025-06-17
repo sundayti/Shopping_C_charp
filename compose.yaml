@@ -40,8 +40,6 @@
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_PAYMENTS_DB}
-      - Kafka__BootstrapServers=kafka:29092
-      - Kafka__GroupId=payments-group
     volumes:
       - payments_postgres_data:/var/lib/postgresql/data
     expose:
@@ -60,8 +58,6 @@
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_ORDERS_DB}
-      - Kafka__BootstrapServers=kafka:29092
-      - Kafka__GroupId=orders-group
     command: ["postgres", "-c", "port=2345"]
     volumes:
       - orders_postgres_data:/var/lib/postgresql/data
@@ -85,6 +81,8 @@
       - .env
     environment:
       - ConnectionStrings__Postgres=${ConnectionStrings_Payments_Postgres}
+      - Kafka__BootstrapServers=kafka:29092
+      - Kafka__GroupId=payments-group
     ports:
       - "6000:5002"
     networks:
@@ -103,6 +101,8 @@
       - .env
     environment:
       - ConnectionStrings__Postgres=${ConnectionStrings_Orders_Postgres}
+      - Kafka__BootstrapServers=kafka:29092
+      - Kafka__GroupId=orders-group
     ports:
       - "6001:5001"
     networks:
