@@ -18,12 +18,13 @@
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: INTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-    expose:
-      - "9092"
+      
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    ports:
+      - "9092:9092" 
     networks:
       - backend
         
@@ -40,6 +41,8 @@
       - payments_postgres_data:/var/lib/postgresql/data
     expose:
       - "5432"
+    ports:
+      - "9000:5432"
     networks:
       - backend
         
@@ -57,6 +60,8 @@
       - orders_postgres_data:/var/lib/postgresql/data
     expose:
       - "2345"
+    ports:
+      - "9001:2345"
     networks:
       - backend
   
