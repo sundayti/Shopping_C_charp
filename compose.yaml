@@ -24,6 +24,7 @@
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_ORDERS_DB}
+    command: ["postgres", "-c", "port=2345"]
     volumes:
       - orders_postgres_data:/var/lib/postgresql/data
     expose:
