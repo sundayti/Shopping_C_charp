@@ -97,7 +97,7 @@ public class CleverInboxWorker(IServiceScopeFactory scopeFactory, ILogger<Clever
                     Content = JsonSerializer.Serialize(outboxContent)
                 };
                 
-                var outboxCommand = new AddOutboxMessageCommand(Type: "", Content: JsonSerializer.Serialize(outboxContent));
+                var outboxCommand = new AddOutboxMessageCommand(Type: "close-order-topic", Content: JsonSerializer.Serialize(outboxContent));
                 await mediator.Send(outboxCommand, ct);
                 
                 await unitOfWork.OutboxMessages.AddAsync(outboxMessage, ct);

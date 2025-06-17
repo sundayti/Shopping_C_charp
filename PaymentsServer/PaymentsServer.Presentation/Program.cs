@@ -38,23 +38,29 @@ builder.WebHost.ConfigureKestrel(options =>
         listenOptions.Protocols = HttpProtocols.Http1AndHttp2);
 });
 
-// var kafkaSection = builder.Configuration.GetSection("Kafka");
-// var consumerConfig = new ConsumerConfig
-// {
-//     BootstrapServers = kafkaSection.GetValue<string>("BootstrapServers") ?? throw new InvalidOperationException("Kafka:BootstrapServers is not configured."),
-//     GroupId            = kafkaSection.GetValue<string>("GroupId") ?? "payments-group",
-//     AutoOffsetReset    = AutoOffsetReset.Earliest,
-//     EnableAutoCommit   = false
-// };
-// builder.Services.AddSingleton(consumerConfig);
+builder.Services.AddSingleton<IProducer<string, string>>(sp =>
+{
+    var config = new ProducerConfig
+    {
+        BootstrapServers = builder.Configuration["Kafka:BootstrapServers"]
+    };
+    return new ProducerBuilder<string, string>(config).Build();
+});
 
-// builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
-//     new ConsumerBuilder<string, string>(sp.GetRequiredService<ConsumerConfig>())
-//         .SetKeyDeserializer(Deserializers.Utf8)
-//         .SetValueDeserializer(Deserializers.Utf8)
-//         .Build());
+builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
+{
+    var config = new ConsumerConfig
+    {
+        BootstrapServers = builder.Configuration["Kafka:BootstrapServers"],
+        GroupId = builder.Configuration["Kafka:GroupId"],
+        AutoOffsetReset = AutoOffsetReset.Earliest
+    };
+    var consumer = new ConsumerBuilder<string, string>(config).Build();
+    return consumer;
+});
 
-// builder.Services.AddHostedService<StupidInboxWorker>();
+builder.Services.AddHostedService<OutboxWorkerService>();
+
 
 var app = builder.Build();
 

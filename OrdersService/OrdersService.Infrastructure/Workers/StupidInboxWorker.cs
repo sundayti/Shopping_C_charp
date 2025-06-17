@@ -17,7 +17,7 @@ public class StupidInboxWorker : BackgroundService
     {
         _scopeFactory = scopeFactory;
         _consumer = consumer;
-        _consumer.Subscribe("create-order-topic");
+        _consumer.Subscribe("close-order-topic");
     }
 
     protected override async Task ExecuteAsync(CancellationToken ct)

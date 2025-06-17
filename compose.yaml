@@ -1,4 +1,32 @@
 ﻿services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    expose:
+      - "2181"
+    networks:
+      - backend
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    expose:
+      - "9092"
+    networks:
+      - backend
+        
   payments_postgres:
     image: postgres:15-alpine
     restart: always
@@ -40,6 +68,7 @@
     restart: always
     depends_on:
       - payments_postgres
+      - kafka
     env_file:
       - .env
     environment:
@@ -58,6 +87,7 @@
     restart: always
     depends_on:
       - orders_postgres
+      - kafka
     env_file:
       - .env
     environment:

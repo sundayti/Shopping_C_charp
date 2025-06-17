@@ -24,7 +24,7 @@ public class CreateOrderCommandHandler(
         });
         var outboxMessage = new OutboxMessage
         {
-            Type = "orderCreated",
+            Type = "create-order-topic",
             Content = content
         };
 

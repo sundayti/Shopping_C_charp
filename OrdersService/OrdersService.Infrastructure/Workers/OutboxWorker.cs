@@ -5,7 +5,7 @@ using OrdersService.Domain.Interfaces;
 
 namespace OrdersService.Infrastructure.Workers;
 
-public class OutboxWorkerService(
+public class OutboxWorker(
     IServiceScopeFactory scopeFactory,
     IProducer<string, string> producer)
     : BackgroundService
