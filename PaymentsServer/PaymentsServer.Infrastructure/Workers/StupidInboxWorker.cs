@@ -35,6 +35,10 @@ public class StupidInboxWorker : BackgroundService
             {
                 _logger.LogInformation("Waiting for messages...");
                 var cr = _consumer.Consume(TimeSpan.FromSeconds(1));
+                if (cr == null || cr.Message == null)
+                {
+                    continue;
+                }
                 _logger.LogInformation("Got message Value: {Value}", cr.Message.Value);
                 
                 var msg = cr.Message.Value;

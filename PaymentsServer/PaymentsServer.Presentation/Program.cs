@@ -49,14 +49,15 @@ builder.Services.AddSingleton<IProducer<string, string>>(sp =>
 
 builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
 {
-    var config = new ConsumerConfig
+    var cfg = new ConsumerConfig
     {
-        BootstrapServers = builder.Configuration["Kafka:BootstrapServers"],
-        GroupId = builder.Configuration["Kafka:GroupId"],
-        AutoOffsetReset = AutoOffsetReset.Earliest
+        BootstrapServers = builder.Configuration["Kafka:BootstrapServers"],    
+        GroupId = builder.Configuration["Kafka:GroupId"],             
+        AutoOffsetReset  = AutoOffsetReset.Earliest,
+        EnableAutoCommit = false,                               
     };
-    var consumer = new ConsumerBuilder<string, string>(config).Build();
-    return consumer;
+
+    return new ConsumerBuilder<string, string>(cfg).Build();
 });
 
 builder.Services.AddHostedService<OutboxWorkerService>();

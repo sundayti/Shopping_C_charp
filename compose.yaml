@@ -14,18 +14,26 @@
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"      
-      - "29092:29092"    
+      - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      # listener’ы, как раньше
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_DOCKER://0.0.0.0:29092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_DOCKER://kafka:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_DOCKER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_DOCKER
+
+      # ↓↓↓ эти две строки решают проблему с __consumer_offsets ↓↓↓
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+      # Опционально, чтобы все создаваемые топики имели RF=1 по умолчанию:
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
     networks:
       - backend
-        
   payments_postgres:
     image: postgres:15-alpine
     restart: always
@@ -43,7 +51,7 @@
       - "9000:5432"
     networks:
       - backend
-        
+
   orders_postgres:
     image: postgres:15-alpine
     restart: always
@@ -62,7 +70,7 @@
       - "9001:2345"
     networks:
       - backend
-  
+
   payments_api:
     build:
       context: ./PaymentsServer
@@ -76,12 +84,11 @@
       - .env
     environment:
       - ConnectionStrings__Postgres=${ConnectionStrings_Payments_Postgres}
-
     ports:
       - "6000:5002"
     networks:
       - backend
-  
+
   orders_api:
     build:
       context: ./OrdersService
@@ -103,9 +110,7 @@
 networks:
   backend:
     driver: bridge
-    
+
 volumes:
   payments_postgres_data:
   orders_postgres_data:
-  
-  
