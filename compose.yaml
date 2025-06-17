@@ -36,15 +36,31 @@
     depends_on:
       - payments_postgres
     env_file:
-      - ./.env
+      - .env
     environment:
-      - ConnectionStrings__Postgres=${ConnectionStrings__Postgres}
+      - ConnectionStrings__Postgres=${ConnectionStrings_Payments_Postgres}
 
     ports:
       - "6000:5002"
     networks:
       - backend
-    
+  
+  orders_api:
+    build:
+      context: ./OrdersService
+      dockerfile: OrdersService.Presentation/Dockerfile
+    image: orders_service_api:latest
+    restart: always
+    depends_on:
+      - orders_postgres
+    env_file:
+      - .env
+    environment:
+      - ConnectionStrings__Postgres=${ConnectionStrings_Orders_Postgres}
+    ports:
+      - "6001:5001"
+    networks:
+      - backend
 
 networks:
   backend:

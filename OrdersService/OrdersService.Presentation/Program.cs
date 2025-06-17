@@ -31,7 +31,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(5002, listenOptions =>
+    options.ListenAnyIP(5001, listenOptions =>
         listenOptions.Protocols = HttpProtocols.Http1AndHttp2);
 });
 
