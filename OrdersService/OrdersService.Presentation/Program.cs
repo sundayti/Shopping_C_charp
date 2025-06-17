@@ -1,10 +1,14 @@
+using System.Net.WebSockets;
 using System.Reflection;
 using Confluent.Kafka;
+using MediatR;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using OrdersService.Application;
+using OrdersService.Application.Queries;
 using OrdersService.Domain.Interfaces;
+using OrdersService.Domain.ValueObjects;
 using OrdersService.Infrastructure.Persistence;
 using OrdersService.Infrastructure.Repositories;
 using OrdersService.Infrastructure.Workers;
@@ -94,5 +98,42 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 app.MapControllers();
+app.UseWebSockets();
+
+app.Map("/api/ws/{orderId:guid}", async (HttpContext context, Guid orderId, IMediator mediator) =>
+{
+    if (!context.WebSockets.IsWebSocketRequest)
+    {
+        context.Response.StatusCode = 400;
+        return;
+    }
+
+    using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+
+    var lastStatus = OrderStatus.New;
+    while (webSocket.State == WebSocketState.Open)
+    {
+        var status = (await mediator.Send(new GetOrderStatusQuery(orderId))).Status;
+
+        if (status != lastStatus)
+        {
+            var message = System.Text.Json.JsonSerializer.Serialize(new { status });
+            var buffer = System.Text.Encoding.UTF8.GetBytes(message);
+            await webSocket.SendAsync(
+                new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+
+            lastStatus = status;
+        }
+
+        if (status is OrderStatus.Finished or OrderStatus.Cancelled)
+        {
+            break;
+        }
+
+        await Task.Delay(1000);
+    }
+
+    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Order complete", CancellationToken.None);
+});
 
 app.Run();
