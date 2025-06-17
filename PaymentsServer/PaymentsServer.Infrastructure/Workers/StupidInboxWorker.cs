@@ -37,6 +37,7 @@ public class StupidInboxWorker : BackgroundService
                 var cr = _consumer.Consume(TimeSpan.FromSeconds(1));
                 if (cr == null || cr.Message == null)
                 {
+                    await Task.Delay(100, ct);
                     continue;
                 }
                 _logger.LogInformation("Got message Value: {Value}", cr.Message.Value);
@@ -75,7 +76,6 @@ public class StupidInboxWorker : BackgroundService
                 Console.WriteLine($"Processing error: {ex.Message}");
             }
             await Task.Delay(100, ct);
-
         }
 
         _consumer.Close();
