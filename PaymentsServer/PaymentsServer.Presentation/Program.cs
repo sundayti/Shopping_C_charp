@@ -60,7 +60,8 @@ builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
 });
 
 builder.Services.AddHostedService<OutboxWorkerService>();
-
+builder.Services.AddHostedService<StupidInboxWorker>();
+builder.Services.AddHostedService<CleverInboxWorker>();
 
 var app = builder.Build();
 

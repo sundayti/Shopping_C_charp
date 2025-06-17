@@ -59,6 +59,8 @@ builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
 });
 
 builder.Services.AddHostedService<OutboxWorker>();
+builder.Services.AddHostedService<StupidInboxWorker>();
+builder.Services.AddHostedService<CleverInboxWorker>();
 
 builder.Logging.AddConsole();
 
