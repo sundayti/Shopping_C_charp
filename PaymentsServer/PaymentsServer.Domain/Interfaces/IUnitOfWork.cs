@@ -4,6 +4,7 @@ public interface IUnitOfWork : IDisposable
 {
     IPaymentAccountRepository PaymentAccounts { get; }
     IInboxRepository InboxMessages { get; }
+    IOutboxRepository OutboxMessages { get; }
     Task BeginTransactionAsync(CancellationToken ct = default);
     Task CommitTransactionAsync(CancellationToken ct = default);
     Task RollbackTransactionAsync(CancellationToken ct = default);

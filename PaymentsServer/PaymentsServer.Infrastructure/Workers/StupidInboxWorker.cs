@@ -1,6 +1,8 @@
 using Confluent.Kafka;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PaymentsServer.Application.Commands;
 using PaymentsServer.Domain.Interfaces;
 using PaymentsServer.Domain.Entities;
 
@@ -27,21 +29,18 @@ public class StupidInboxWorker : BackgroundService
             try
             {
                 var cr = _consumer.Consume(ct);
-
                 var msg = System.Text.Json.JsonSerializer.Deserialize<InboxKafkaMessage>(cr.Message.Value);
 
-                using var scope = _scopeFactory.CreateScope();
-                var repo = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
-
                 if (msg != null)
-                    await repo.AddAsync(new InboxMessage
-                    {
-                        Id = msg.Id,
-                        Type = msg.Type,
-                        Content = msg.Content
-                    }, ct);
+                {
+                    using var scope = _scopeFactory.CreateScope();
+                    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-                _consumer.Commit(cr);
+                    var command = new AddInboxMessageCommand(msg.Id, msg.Type, msg.Content);
+                    await mediator.Send(command, ct);
+                    
+                    _consumer.Commit(cr);
+                }
             }
             catch (ConsumeException ex)
             {

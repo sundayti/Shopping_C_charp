@@ -10,7 +10,8 @@ public sealed class UnitOfWork(PaymentAccountsDbContext context) : IUnitOfWork
 
     public IPaymentAccountRepository PaymentAccounts { get; } = new PaymentAccountRepository(context);
     public IInboxRepository InboxMessages { get; } = new InboxRepository(context);
-    
+    public IOutboxRepository OutboxMessages { get; } = new OutboxRepository(context);
+
     public async Task BeginTransactionAsync(CancellationToken ct = default)
     {
         _transaction = await context.Database.BeginTransactionAsync(ct);

@@ -9,10 +9,13 @@ public class PaymentAccountsDbContext(DbContextOptions<PaymentAccountsDbContext>
 {
     public DbSet<PaymentAccount> PaymentAccounts { get; init; } 
     public DbSet<InboxMessage> InboxMessages { get; init; }
+    public DbSet<OutboxMessage> OutboxMessages {get; init;}
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         CreateInboxMessagesDb(modelBuilder);
+        CreateOutboxMessageDb(modelBuilder);
         CreatePaymentAccountsDb(modelBuilder);
     }
 
@@ -68,6 +71,36 @@ public class PaymentAccountsDbContext(DbContextOptions<PaymentAccountsDbContext>
             entity.Property(x => x.Balance)
                 .HasConversion(balanceConverter)
                 .HasColumnName("balance")
+                .IsRequired();
+        });
+    }
+    
+    private void CreateOutboxMessageDb(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<OutboxMessage>(entity =>
+        {
+            var statusConverter = new ValueConverter<OutboxMessageStatus, short>(
+                status => (short)status,
+                status => (OutboxMessageStatus)status);
+            
+            entity.ToTable("outbox_messages");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("message_id")
+                .IsRequired();
+            
+            entity.Property(x => x.Type)
+                .HasColumnName("type")
+                .IsRequired();
+            
+            entity.Property(x => x.Content)
+                .HasColumnName("content")
+                .IsRequired();
+
+            entity.Property(x => x.Status)
+                .HasConversion(statusConverter)
+                .HasColumnName("status")
                 .IsRequired();
         });
     }

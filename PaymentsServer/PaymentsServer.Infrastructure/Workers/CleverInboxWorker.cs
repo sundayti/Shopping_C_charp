@@ -4,8 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PaymentsServer.Application.Commands;
+using PaymentsServer.Application.DTOs;
 using PaymentsServer.Application.Queries;
+using PaymentsServer.Domain.Entities;
 using PaymentsServer.Domain.Interfaces;
+using PaymentsServer.Domain.ValueObjects;
 
 namespace PaymentsServer.Infrastructure.Workers;
 
@@ -43,7 +46,6 @@ public class CleverInboxWorker(IServiceScopeFactory scopeFactory, ILogger<Clever
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         
-        // 1. Получаем пачку через Query
         var messages = await mediator.Send(new GetPendingInboxMessagesQuery(BatchSize), ct);
         if (!messages.Any()) return;
 
@@ -62,7 +64,7 @@ public class CleverInboxWorker(IServiceScopeFactory scopeFactory, ILogger<Clever
                 }
 
                 var result = await mediator.Send(command, ct);
-
+                
                 switch (result.Value)
                 {
                     case Success:
@@ -82,6 +84,23 @@ public class CleverInboxWorker(IServiceScopeFactory scopeFactory, ILogger<Clever
                         logger.LogError("Unknown error for order {OrderId} by {UserId}", command.OrderId, command.UserId);
                         break;
                 }
+                
+                var outboxContent = new OutboxMessageDto
+                {
+                    OrderId = command.OrderId,
+                    IsSuccess = message.Status == InboxMessageStatus.Success
+                };
+                
+                var outboxMessage = new OutboxMessage
+                {
+                    Type = "payment_completed",
+                    Content = JsonSerializer.Serialize(outboxContent)
+                };
+                
+                var outboxCommand = new AddOutboxMessageCommand(Type: "", Content: JsonSerializer.Serialize(outboxContent));
+                await mediator.Send(outboxCommand, ct);
+                
+                await unitOfWork.OutboxMessages.AddAsync(outboxMessage, ct);
                 
                 await unitOfWork.CommitTransactionAsync(ct);
             }
